@@ -111,7 +111,7 @@ class Route:
 
     def change_owner(self, owner: str) -> 'Route':
         """Change owner of the Route
-        Won't change name if new name is the same as current
+        Throws ValueError if new owner is the same as current
 
         Args:
             owner (str): id (uuid4) of the new owner
