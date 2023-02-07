@@ -273,8 +273,8 @@ class Database:
 
     def create_note(self, note):
         insert = """
-            INSERT INTO notes (owner, name, content)
-            VALUES (%(owner)s, %(name)s, %(content)s)
+            INSERT INTO notes (owner, name, content, private)
+            VALUES (%(owner)s, %(name)s, %(content)s, %(private)s)
             RETURNING *
         """
         return self._insert(insert, vars(note))
@@ -306,10 +306,10 @@ class Database:
         """
         return self._updateone(update, {'id': id, 'name': name}, returning=True)
 
-    def update_note(self, id, content):
+    def update_note(self, id, content, private):
         update = """
             UPDATE notes
-                SET content=%(content)s
+                SET content=%(content)s, private=%(private)s
                 WHERE id = %(id)s
             RETURNING *
         """

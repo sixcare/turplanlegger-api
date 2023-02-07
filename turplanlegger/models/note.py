@@ -19,12 +19,14 @@ class Note:
         id (int): Optional, the ID of the object
         owner (str): The UUID4 of the owner of the object
         content (str): The contents of the note
+        private (bool): Flag if the trip is private
+                        Default so False (public)
         name (str): The name or title of the note
         create_time (datetime): Time of creation,
                                 Default: datetime.now()
     """
-    
-    def __init__(self, owner: str, content: str, **kwargs) -> None:
+
+    def __init__(self, owner: str, content: str, private: bool = True, **kwargs) -> None:
         if not owner:
             raise ValueError('Missing mandatory field \'owner\'')
         if not isinstance(owner, str):
@@ -33,9 +35,12 @@ class Note:
             raise ValueError('Missing mandatory field \'content\'')
         if not isinstance(content, str):
             raise TypeError('\'content\' must be string')
+        if not isinstance(private, bool):
+            raise TypeError("'private' must be boolean")
 
         self.owner = owner
         self.content = content
+        self.private = private
         self.id = kwargs.get('id', None)
         self.name = kwargs.get('name', None)
         self.create_time = kwargs.get('create_time', None)
@@ -54,7 +59,8 @@ class Note:
             id=json.get('id', None),
             owner=g.user.id,
             content=json.get('content', None),
-            name=json.get('name', None),
+            private=json.get('private', None),
+            name=json.get('name', None)
         )
 
     @property
@@ -65,6 +71,7 @@ class Note:
             'owner': self.owner,
             'name': self.name,
             'content': self.content,
+            'private': self.private,
             'create_time': self.create_time
         }
 
@@ -91,8 +98,8 @@ class Note:
         return db.rename_note(self.id, self.name)
 
     def update(self) -> 'Note':
-        """Updates the Note object in the database"""
-        return db.update_note(self.id, self.content)
+        """Updates the Note content or privacy object in the database"""
+        return db.update_note(self.id, self.content, self.private)
 
     @staticmethod
     def find_note(id: int) -> 'Note':
@@ -151,5 +158,6 @@ class Note:
             owner=rec.owner,
             name=rec.name,
             content=rec.content,
+            private=rec.private,
             create_time=rec.create_time
         )
